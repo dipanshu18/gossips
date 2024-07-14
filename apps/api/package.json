@@ -6,8 +6,8 @@
   "scripts": {
     "build": "yarn tsc -b",
     "clean": "rm -rf ./dist",
-    "start:dev": "nodemon src/index.ts",
-    "start:prod": "yarn build && node src/index.js"
+    "dev": "nodemon src/index.ts",
+    "start": "yarn build && node src/index.js"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
