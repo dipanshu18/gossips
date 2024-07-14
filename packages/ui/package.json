@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./button": "./src/button.tsx"
+    "./primaryButton": "./src/primaryButton.tsx",
+    "./secondaryButton": "./src/secondaryButton.tsx",
+    "./outlineButton": "./src/outlineButton.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
