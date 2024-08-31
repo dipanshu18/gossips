@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { AR_One_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
+
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import Footer from "@/components/Footer";
 
-const arOneSans = AR_One_Sans({ subsets: ["latin"], weight: "400" });
+const poppins = Poppins({ subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
   title: "Gossips",
-  description: "Realtime chat app with dms and group chats",
+  description: "Realtime scalable chat app with dms and group chats",
 };
 
 export default function RootLayout({
@@ -19,19 +21,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={arOneSans.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="min-h-screen flex flex-col justify-between bg-slate-300 dark:bg-slate-950">
+      <body className={poppins.className}>
+        <div className="antialiased h-screen flex flex-col justify-between">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <Navbar />
             <div>{children}</div>
             <Footer />
-          </div>
-        </ThemeProvider>
+            <Toaster richColors visibleToasts={10} />
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );

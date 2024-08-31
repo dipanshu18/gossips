@@ -1,13 +1,40 @@
+import dotenv from "dotenv";
+dotenv.config();
+const PORT = process.env.PORT;
+
+import express, { NextFunction, Request, Response } from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
-const httpServer = createServer();
-const io = new Server(httpServer, {
-  cors: {
-    allowedHeaders: "*",
-    origin: "*",
-  },
+import { authRouter } from "./routes/auth.route";
+
+const app = express();
+const httpServer = createServer(app);
+const io = new Server();
+io.attach(httpServer);
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(
+  cors({
+    credentials: true,
+    origin: ["http://localhost:3000"],
+  })
+);
+app.use(cookieParser());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log("LOG:", req.path, req.method);
+  next();
 });
+
+app.get("/", (req: Request, res: Response) => {
+  return res.json({ status: "working..." });
+});
+
+app.use("/api/v1/auth", authRouter);
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
@@ -23,6 +50,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(8080, () => {
-  console.log("Server started on port:", 8080);
+httpServer.listen(PORT, () => {
+  console.log("Server started on port:", PORT);
 });

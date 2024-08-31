@@ -15,6 +15,7 @@ import { Button } from "./ui/button";
 import { ModeToggle } from "./ModeToggle";
 import Image from "next/image";
 import { cookies } from "next/headers";
+import LogoutBtn from "./LogoutBtn";
 
 function Logo() {
   return (
@@ -49,9 +50,9 @@ function ActionButtons() {
                 <SheetTitle>Navbar Content</SheetTitle>
               </VisuallyHidden>
               <SheetDescription>
-                <div className="mt-10 flex flex-col items-start space-y-5">
+                <div className="mt-10 w-full flex flex-col items-start space-y-5">
                   {session ? (
-                    <Button className="w-full">Log out</Button>
+                    <LogoutBtn />
                   ) : (
                     <>
                       <SheetClose asChild>
@@ -84,7 +85,7 @@ function ActionButtons() {
       <div className="hidden md:flex md:items-center md:space-x-5">
         <ModeToggle />
         {session ? (
-          <Button>Logout</Button>
+          <LogoutBtn />
         ) : (
           <>
             <Link href={"/login"}>
@@ -102,7 +103,7 @@ function ActionButtons() {
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 w-full backdrop-blur flex justify-between items-center px-10 py-2 border-b">
+    <nav className="sticky top-0 z-50 w-full backdrop-blur flex justify-between items-center px-10 py-5 border-b">
       <Logo />
       <ActionButtons />
     </nav>

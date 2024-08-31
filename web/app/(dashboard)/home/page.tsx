@@ -8,7 +8,7 @@ import ChatContent from "@/components/ChatContent";
 
 export default function Home() {
   return (
-    <ResizablePanelGroup direction="horizontal" className="border min-h-screen">
+    <ResizablePanelGroup direction="horizontal" className="border">
       <ResizablePanel defaultSize={20} minSize={20} maxSize={30} order={1}>
         <div className="flex flex-col items-center h-full">
           <SidebarProfile />
