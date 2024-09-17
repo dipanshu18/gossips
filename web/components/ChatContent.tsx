@@ -7,8 +7,8 @@ import RightChatBubble from "./RightChatBubble";
 
 export default function ChatContent() {
   return (
-    <div className="flex flex-col w-full">
-      <div className="border-b flex items-center gap-2 p-4">
+    <div className="flex flex-col w-full h-full">
+      <div className="border-b flex items-center gap-2 py-4 pl-4">
         <Image
           src={"/logo.png"}
           alt="User profile photo"
@@ -18,7 +18,7 @@ export default function ChatContent() {
         />
         <h1 className="font-extrabold md:text-2xl">User Full Name</h1>
       </div>
-      <div className="flex-grow p-5 overflow-y-auto space-y-5 max-h-[calc(100vh-20rem)]">
+      <div className="flex-1 p-5 overflow-y-auto space-y-5 max-h-[calc(100vh-14rem)]">
         <LeftChatBubble />
         <RightChatBubble />
         <RightChatBubble />

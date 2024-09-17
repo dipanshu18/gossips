@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import { authRouter } from "./routes/auth.route";
+import { authMiddleware } from "./middlewares/auth.middleware";
+import { userRouter } from "./routes/user.route";
 
 const app = express();
 const httpServer = createServer(app);
@@ -35,6 +37,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", authMiddleware, userRouter);
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);

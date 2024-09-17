@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
-import Footer from "@/components/Footer";
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" });
 
@@ -30,8 +29,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Navbar />
-            <div>{children}</div>
-            <Footer />
+            <div className="flex-1">{children}</div>
             <Toaster richColors visibleToasts={10} />
           </ThemeProvider>
         </div>

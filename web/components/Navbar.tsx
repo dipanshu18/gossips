@@ -16,6 +16,7 @@ import { ModeToggle } from "./ModeToggle";
 import Image from "next/image";
 import { cookies } from "next/headers";
 import LogoutBtn from "./LogoutBtn";
+import ProfileCircle from "./ProfileCircle";
 
 function Logo() {
   return (
@@ -50,9 +51,22 @@ function ActionButtons() {
                 <SheetTitle>Navbar Content</SheetTitle>
               </VisuallyHidden>
               <SheetDescription>
-                <div className="mt-10 w-full flex flex-col items-start space-y-5">
+                <div className="mt-10 w-full text-xl text-black dark:text-white flex flex-col items-start space-y-5">
                   {session ? (
-                    <LogoutBtn />
+                    <>
+                      <SheetClose asChild>
+                        <Link href="/explore">Explore</Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link href="/friend-requests">Friend Requests</Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link href="/profile">Profile</Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <LogoutBtn />
+                      </SheetClose>
+                    </>
                   ) : (
                     <>
                       <SheetClose asChild>
@@ -73,19 +87,26 @@ function ActionButtons() {
                       </SheetClose>
                     </>
                   )}
-                  <ModeToggle />
+                  <div className="flex w-full justify-end">
+                    <ModeToggle />
+                  </div>
                 </div>
               </SheetDescription>
-              <SheetFooter></SheetFooter>
             </SheetHeader>
           </SheetContent>
         </Sheet>
       </div>
 
       <div className="hidden md:flex md:items-center md:space-x-5">
-        <ModeToggle />
         {session ? (
-          <LogoutBtn />
+          <>
+            <Link href="/explore">Explore</Link>
+            <Link href="/friend-requests">Friend Requests</Link>
+            <Link href="/profile">
+              <ProfileCircle />
+            </Link>
+            <LogoutBtn />
+          </>
         ) : (
           <>
             <Link href={"/login"}>
@@ -96,6 +117,7 @@ function ActionButtons() {
             </Link>
           </>
         )}
+        <ModeToggle />
       </div>
     </>
   );
@@ -103,7 +125,7 @@ function ActionButtons() {
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 w-full backdrop-blur flex justify-between items-center px-10 py-5 border-b">
+    <nav className="sticky top-0 z-50 w-full backdrop-blur flex justify-between items-center px-10 py-3 border-b">
       <Logo />
       <ActionButtons />
     </nav>
