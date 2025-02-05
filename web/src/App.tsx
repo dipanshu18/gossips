@@ -1,66 +1,61 @@
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import { useSocket } from "./hooks/useSocket";
 
 export default function App() {
-  const [socket, setSocket] = useState<WebSocket | undefined>();
+  const { messages, sendMessage } = useSocket();
+  const messageRef = useRef<HTMLInputElement>(null);
   const userIdRef = useRef<HTMLInputElement>(null);
   const receiverIdRef = useRef<HTMLInputElement>(null);
-  const messageIdRef = useRef<HTMLInputElement>(null);
-
-  const userId = localStorage.getItem("userId");
-
-  useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:7778?userId=${userId}`);
-
-    setSocket(ws);
-
-    ws.onmessage = (event) => {
-      console.log(event);
-    };
-
-    return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
-    };
-  }, [userId]);
-
-  function handleSendMessage(e: FormEvent) {
-    e.preventDefault();
-    const payload = JSON.stringify({
-      userId: userIdRef.current?.value,
-      receiverId: receiverIdRef.current?.value,
-      chatId: "1",
-      text: messageIdRef.current?.value,
-    });
-    socket?.send(payload);
-  }
 
   return (
     <div>
       <h1 className="text-3xl font-extrabold">Hello, world</h1>
 
       <div>
-        <input type="text" placeholder="userid" ref={userIdRef} name="" id="" />
-      </div>
-      <div>
+        <input ref={userIdRef} type="text" placeholder="userId" name="" id="" />
         <input
-          type="text"
-          placeholder="receiver"
           ref={receiverIdRef}
+          type="text"
+          placeholder="receiverId"
           name=""
           id=""
         />
       </div>
+      <div>
+        {messages ? (
+          messages.map((item, idx) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+            <div key={idx}>
+              <p className="text-xl text-black">{item}</p>
+            </div>
+          ))
+        ) : (
+          <h1>No messages</h1>
+        )}
+      </div>
 
       <div>
         <input
-          ref={messageIdRef}
+          ref={messageRef}
           type="text"
           placeholder="message"
           name=""
           id=""
         />
-        <button onClick={handleSendMessage} type="submit">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            sendMessage(
+              JSON.stringify({
+                userId: userIdRef.current?.value,
+                receiverId: receiverIdRef.current?.value,
+                text: messageRef.current?.value,
+                chatId: 1,
+              })
+            );
+          }}
+          type="submit"
+        >
           send
         </button>
       </div>

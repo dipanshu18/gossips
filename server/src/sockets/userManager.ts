@@ -1,37 +1,20 @@
-import { WebSocket } from "ws";
+import type { WebSocket } from "ws";
 import Redis from "ioredis";
 
 const onlineUsers: { [userId: string]: WebSocket } = {};
 
-const pub = new Redis({
-  host: "redis",
-});
-const sub = new Redis({
-  host: "redis",
-});
 const client = new Redis({
   host: "redis",
 });
+
+const pub = client.duplicate();
+const sub = client.duplicate();
 
 export class UserManager {
   constructor(userId: string, socket: WebSocket) {
     onlineUsers[userId] = socket;
     client.sadd("online_users", userId);
     sub.subscribe("MESSAGES");
-    sub.subscribe(`USER:${userId}`);
-
-    sub.on("message", (channel, message) => {
-      if (channel === `USER:${userId}`) {
-        const uSocket = onlineUsers[userId];
-        if (uSocket && uSocket.readyState === WebSocket.OPEN) {
-          uSocket.send(message);
-        }
-      }
-    });
-
-    socket.on("close", () => {
-      this.removeUser(userId);
-    });
   }
 
   sendMessage(message: {
@@ -41,12 +24,25 @@ export class UserManager {
     text: string;
   }) {
     const receiverId = message.receiverId;
-    if (onlineUsers[receiverId]) {
-      const rSocket = onlineUsers[receiverId];
-      rSocket.send(JSON.stringify(message));
-    } else {
-      pub.publish(`USER:${receiverId}`, JSON.stringify(message));
-    }
+    const userId = message.userId;
+    const uSocket = onlineUsers[userId];
+    // if (onlineUsers[receiverId]) {
+    //   const rSocket = onlineUsers[receiverId];
+    //   rSocket.send(JSON.stringify(message));
+    // } else {
+    pub.publish("MESSAGES", JSON.stringify(message));
+
+    sub.on("message", (channel, message) => {
+      if (
+        channel === "MESSAGES" &&
+        JSON.parse(message).receiverId === receiverId
+      ) {
+        const rsocket = onlineUsers[receiverId];
+        rsocket.send(message);
+      }
+    });
+    // }
+    uSocket.send(JSON.stringify(message));
   }
 
   removeUser(userId: string) {

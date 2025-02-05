@@ -24,13 +24,13 @@ wss.on("connection", (socket: WebSocket, request) => {
 
   socket.on("message", (data) => {
     const decoded = JSON.parse(data.toString());
-
     user.sendMessage(decoded);
   });
 
   socket.on("close", () => {
     user.removeUser(userId as string);
     socket.close();
+    console.log("Client disconnected", userId);
   });
 });
 
