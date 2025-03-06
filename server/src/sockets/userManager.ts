@@ -1,52 +1,82 @@
+import "dotenv/config";
+const REDIS_URL = process.env.REDIS_URL as string;
+
 import type { WebSocket } from "ws";
 import Redis from "ioredis";
 
-const onlineUsers: { [userId: string]: WebSocket } = {};
+interface IMessage {
+  userId: string;
+  chatId: string;
+  text: string;
+}
 
-const client = new Redis({
-  host: "redis",
+const localOnlineUsers: { [userId: string]: WebSocket } = {};
+
+const redisClient = new Redis(REDIS_URL);
+const redisPub = redisClient.duplicate();
+const redisSub = redisClient.duplicate();
+
+redisSub.subscribe("chat:*");
+
+redisSub.on("pmessage", async (_, channel, message) => {
+  const parsed = JSON.parse(message.toString()) as {
+    type: "new_message";
+    message: IMessage;
+  };
+  const chatId = channel.split(":")[1];
+
+  const participants = await redisClient.smembers(
+    `chat_participants:${chatId}`
+  );
+
+  // biome-ignore lint/complexity/noForEach: <explanation>
+  participants.forEach((userId) => {
+    if (localOnlineUsers[userId]) {
+      localOnlineUsers[userId].send(
+        JSON.stringify({
+          type: "new_message",
+          message: parsed.message,
+        })
+      );
+    }
+  });
 });
 
-const pub = client.duplicate();
-const sub = client.duplicate();
-
 export class UserManager {
-  constructor(userId: string, socket: WebSocket) {
-    onlineUsers[userId] = socket;
-    client.sadd("online_users", userId);
-    sub.subscribe("MESSAGES");
+  constructor(userId: string, socket: WebSocket, chatId: string) {
+    localOnlineUsers[userId] = socket;
+    redisClient.sadd("online_users", userId);
+    redisClient.sadd(`chat_participants:${chatId}`, userId);
   }
 
-  sendMessage(message: {
-    userId: string;
-    receiverId: string;
-    chatId: string;
-    text: string;
-  }) {
-    const receiverId = message.receiverId;
-    const userId = message.userId;
-    const uSocket = onlineUsers[userId];
-    // if (onlineUsers[receiverId]) {
-    //   const rSocket = onlineUsers[receiverId];
-    //   rSocket.send(JSON.stringify(message));
-    // } else {
-    pub.publish("MESSAGES", JSON.stringify(message));
+  async sendMessage(message: IMessage) {
+    const { chatId } = message;
 
-    sub.on("message", (channel, message) => {
-      if (
-        channel === "MESSAGES" &&
-        JSON.parse(message).receiverId === receiverId
-      ) {
-        const rsocket = onlineUsers[receiverId];
-        rsocket.send(message);
+    const participants = await redisClient.smembers(
+      `chat_participants:${chatId}`
+    );
+
+    // biome-ignore lint/complexity/noForEach: <explanation>
+    participants.forEach((userId) => {
+      if (localOnlineUsers[userId]) {
+        localOnlineUsers[userId].send(
+          JSON.stringify({
+            type: "new_message",
+            message,
+          })
+        );
       }
     });
-    // }
-    uSocket.send(JSON.stringify(message));
+
+    await redisPub.publish(
+      `chat:${chatId}`,
+      JSON.stringify({ type: "new_message", message })
+    );
   }
 
-  removeUser(userId: string) {
-    delete onlineUsers[userId];
-    client.srem("online_users", userId);
+  async removeUser(userId: string, chatId?: string) {
+    delete localOnlineUsers[userId];
+    await redisClient.srem("online_users", userId);
+    await redisClient.srem(`chat_participants:${chatId}`, userId);
   }
 }
