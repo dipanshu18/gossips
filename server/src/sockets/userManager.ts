@@ -16,7 +16,7 @@ const redisClient = new Redis(REDIS_URL);
 const redisPub = redisClient.duplicate();
 const redisSub = redisClient.duplicate();
 
-redisSub.subscribe("chat:*");
+redisSub.psubscribe("chat:*");
 
 redisSub.on("pmessage", async (_, channel, message) => {
   const parsed = JSON.parse(message.toString()) as {
@@ -56,22 +56,24 @@ export class UserManager {
       `chat_participants:${chatId}`
     );
 
-    // biome-ignore lint/complexity/noForEach: <explanation>
-    participants.forEach((userId) => {
-      if (localOnlineUsers[userId]) {
-        localOnlineUsers[userId].send(
-          JSON.stringify({
-            type: "new_message",
-            message,
-          })
-        );
-      }
-    });
-
-    await redisPub.publish(
-      `chat:${chatId}`,
-      JSON.stringify({ type: "new_message", message })
-    );
+    if (participants.length > 0) {
+      // biome-ignore lint/complexity/noForEach: <explanation>
+      participants.forEach((userId) => {
+        if (localOnlineUsers[userId]) {
+          localOnlineUsers[userId].send(
+            JSON.stringify({
+              type: "new_message",
+              message,
+            })
+          );
+        }
+      });
+    } else {
+      await redisPub.publish(
+        `chat:${chatId}`,
+        JSON.stringify({ type: "new_message", message })
+      );
+    }
   }
 
   async removeUser(userId: string, chatId?: string) {
