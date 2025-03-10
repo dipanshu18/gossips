@@ -1,8 +1,13 @@
 import { createContext, useCallback, useEffect, useState } from "react";
+import axios from "axios";
+
+import type { IChat, IMessage } from "../../types";
 
 interface ISocketContext {
   socket: WebSocket | undefined;
-  messages: string[];
+  getChat: (id: string) => void;
+  chat: IChat | undefined;
+  messages: IMessage[];
   sendMessage: (msg: string) => void;
 }
 
@@ -10,21 +15,42 @@ const SocketContext = createContext<ISocketContext | undefined>(undefined);
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<WebSocket | undefined>(undefined);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [chat, setChat] = useState<IChat>();
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
-  const sendMessage: ISocketContext["sendMessage"] = useCallback(
-    (msg: string) => {
-      if (socket) {
-        socket.send(msg);
+  const getChat = useCallback(async (id: string) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:7777/api/v1/chats/${id}`
+      );
+
+      if (response.status === 200) {
+        const data = await response.data.chats;
+        setChat(data);
+        setMessages(data.messages);
+        return;
       }
+    } catch (error) {
+      console.log("ERROR:", error);
+    }
+  }, []);
+
+  const sendMessage = useCallback(
+    (msg: string) => {
+      const payload = JSON.stringify({
+        type: "new_message",
+        message: {
+          chatId: chat?.id,
+          text: msg,
+        },
+      });
+      socket?.send(payload);
     },
-    [socket]
+    [chat?.id, socket]
   );
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-
-    const ws = new WebSocket(`ws://localhost:7778?userId=${userId}`);
+    const ws = new WebSocket("ws://localhost:7778");
     setSocket(ws);
 
     ws.onmessage = (event) => {
@@ -41,7 +67,9 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, messages, sendMessage }}>
+    <SocketContext.Provider
+      value={{ socket, getChat, chat, messages, sendMessage }}
+    >
       {children}
     </SocketContext.Provider>
   );

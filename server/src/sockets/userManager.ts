@@ -76,7 +76,7 @@ export class UserManager {
     }
   }
 
-  async removeUser(userId: string, chatId?: string) {
+  async removeUser(userId: string, chatId: string) {
     delete localOnlineUsers[userId];
     await redisClient.srem("online_users", userId);
     await redisClient.srem(`chat_participants:${chatId}`, userId);

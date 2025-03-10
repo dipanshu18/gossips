@@ -43,11 +43,11 @@ wss.on("connection", (socket: WebSocket, request) => {
 
   socket.on("message", (data) => {
     const decoded = JSON.parse(data.toString());
-    user.sendMessage(decoded);
+    user.sendMessage({ userId, ...decoded });
   });
 
   socket.on("close", () => {
-    user.removeUser(userId as string);
+    user.removeUser(userId as string, chatId as string);
     socket.close();
     console.log("Client disconnected", userId);
   });
