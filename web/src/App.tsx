@@ -1,64 +1,24 @@
-import { useRef } from "react";
-import { useSocket } from "./hooks/useSocket";
+import { Route, Routes } from "react-router";
+import Landing from "./pages/Landing";
+import { ProtectedRoutes } from "./components/ProtectedRoutes";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
+import Explore from "./pages/Explore";
 
 export default function App() {
-  const { messages, sendMessage } = useSocket();
-  const messageRef = useRef<HTMLInputElement>(null);
-  const userIdRef = useRef<HTMLInputElement>(null);
-  const receiverIdRef = useRef<HTMLInputElement>(null);
-
   return (
-    <div>
-      <h1 className="text-3xl font-extrabold">Hello, world</h1>
+    <Routes>
+      <Route index path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
-      <div>
-        <input ref={userIdRef} type="text" placeholder="userId" name="" id="" />
-        <input
-          ref={receiverIdRef}
-          type="text"
-          placeholder="receiverId"
-          name=""
-          id=""
-        />
-      </div>
-      <div>
-        {messages ? (
-          messages.map((item, idx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <div key={idx}>
-              <p className="text-xl text-black">{item}</p>
-            </div>
-          ))
-        ) : (
-          <h1>No messages</h1>
-        )}
-      </div>
-
-      <div>
-        <input
-          ref={messageRef}
-          type="text"
-          placeholder="message"
-          name=""
-          id=""
-        />
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            sendMessage(
-              JSON.stringify({
-                userId: userIdRef.current?.value,
-                receiverId: receiverIdRef.current?.value,
-                text: messageRef.current?.value,
-                chatId: 1,
-              })
-            );
-          }}
-          type="submit"
-        >
-          send
-        </button>
-      </div>
-    </div>
+      <Route path="/" element={<ProtectedRoutes />}>
+        <Route path="/home" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+    </Routes>
   );
 }
