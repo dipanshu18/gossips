@@ -10,9 +10,82 @@ export default function Profile() {
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-extrabold">Name name</h1>
           <p className="text-lg font-semibold">Email email</p>
-          <button type="button" className="btn">
+          {/* Open the modal using document.getElementById('ID').showModal() method */}
+          {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
+          <button
+            className="btn"
+            onClick={() => {
+              const modal = document.getElementById(
+                "edit_profile_modal"
+              ) as HTMLDialogElement;
+              modal.showModal();
+            }}
+          >
             Edit profile
           </button>
+          <dialog
+            id="edit_profile_modal"
+            className="modal modal-bottom sm:modal-middle"
+          >
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">
+                Save changes after updating info
+              </h3>
+              <div className="w-full">
+                <form method="dialog">
+                  <fieldset className="fieldset w-full gap-3">
+                    <div>
+                      <fieldset className="fieldset">
+                        <legend className="fieldset-legend">
+                          Upload your profile photo
+                        </legend>
+                        <input type="file" className="file-input w-full" />
+                        {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
+                        <label className="fieldset-label">Max size 2MB</label>
+                      </fieldset>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="fieldset-label" htmlFor="name">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        className="input w-full"
+                        placeholder="Name"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="fieldset-label" htmlFor="email">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        className="input w-full"
+                        placeholder="Email"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="fieldset-label" htmlFor="password">
+                        Password
+                      </label>
+                      <input
+                        type="password"
+                        className="input w-full"
+                        placeholder="Password"
+                      />
+                    </div>
+                  </fieldset>
+
+                  <button className="btn mt-5 w-full" type="submit">
+                    Save changes
+                  </button>
+                </form>
+              </div>
+            </div>
+          </dialog>
         </div>
       </div>
       <div className="my-2 w-full">

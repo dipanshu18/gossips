@@ -3,7 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 
 export default function Signup() {
   return (
-    <div className="hero bg-base-200 min-h-screen">
+    <div className="hero mt-10">
       <div className="hero-content flex-col">
         <div>
           <h1 className="text-4xl font-extrabold mb-2">
@@ -11,7 +11,7 @@ export default function Signup() {
           </h1>
         </div>
 
-        <div className="card bg-base-100 w-full min-w-lg shrink-0 shadow-lg">
+        <div className="card bg-base-200 w-full min-w-lg shrink-0 shadow-lg">
           <div className="card-body">
             <fieldset className="fieldset gap-3">
               <div>
@@ -23,6 +23,17 @@ export default function Signup() {
                   {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
                   <label className="fieldset-label">Max size 2MB</label>
                 </fieldset>
+              </div>
+
+              <div className="space-y-1">
+                <label className="fieldset-label" htmlFor="name">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  className="input w-full"
+                  placeholder="Name"
+                />
               </div>
 
               <div className="space-y-1">
@@ -57,7 +68,7 @@ export default function Signup() {
                 Signup
               </button>
 
-              <p className="my-2 text-center">OR</p>
+              <p className="my-2 text-center text-lg font-extrabold">or</p>
 
               <div>
                 <Link to={"#"} className="btn btn-neutral w-full">

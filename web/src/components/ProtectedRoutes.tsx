@@ -14,7 +14,7 @@ export function ProtectedRoutes() {
       </div>
     </div>
   ) : user ? (
-    <div className="max-w-7xl mx-auto px-12">
+    <div className="md:max-w-7xl mx-auto px-5 md:px-12">
       <Outlet />
     </div>
   ) : (

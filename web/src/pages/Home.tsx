@@ -1,12 +1,16 @@
 import { useState } from "react";
 import ChatBox from "../components/ChatBox";
+import useMobileView from "../hooks/useMobileView";
+import { useNavigate } from "react-router";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [selectedChat, setSelectedChat] = useState(0);
+  const isMobile = useMobileView(628);
 
   return (
-    <div className="border md:border-x flex h-[90dvh]">
-      <div className="md:border-r md:max-w-xs flex-1 h-full overflow-y-auto">
+    <div className="flex h-[90dvh] scrollbar-thumb-neutral-800 scrollbar-track-neutral-950">
+      <div className="md:max-w-2xs lg:max-w-md flex-1 h-full scrollbar-thin md:overflow-y-auto gap-2 flex flex-col py-2">
         {Array(17)
           .fill("")
           .map((_, idx) => (
@@ -14,10 +18,12 @@ export default function Home() {
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
               key={idx}
-              onClick={() => setSelectedChat(idx)}
-              className={`cursor-pointer flex items-center gap-2 border-t py-5 pl-5 hover:bg-base-200 ${
-                idx === 16 && "border-b"
-              }`}
+              onClick={() =>
+                isMobile ? navigate(`/home/${idx}`) : setSelectedChat(idx)
+              }
+              className={
+                "cursor-pointer flex items-center gap-1 bg-base-200 rounded-md py-5 pl-5 hover:bg-base-200"
+              }
             >
               <img
                 src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
@@ -28,7 +34,7 @@ export default function Home() {
             </div>
           ))}
       </div>
-      <div className="flex-1 hidden md:block">
+      <div className="flex-1 hidden md:block p-2">
         {selectedChat ? (
           <ChatBox chatId={selectedChat} />
         ) : (

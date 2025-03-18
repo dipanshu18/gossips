@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin 'tailwind-scrollbar';
+
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark, mytheme;
 }
@@ -36,4 +38,8 @@
   --border: 1.5px;
   --depth: 1;
   --noise: 1;
+}
+
+* {
+  scroll-behavior: smooth;
 }
