@@ -6,6 +6,7 @@ import { WebSocketServer, type WebSocket } from "ws";
 
 import { UserManager } from "./sockets/userManager";
 import { APP_ORIGIN, PORT, WS_PORT } from "./constants/env";
+import authRoutes from "./routes/auth.route";
 
 const app = express();
 
@@ -49,6 +50,8 @@ wss.on("connection", (socket: WebSocket, request) => {
     console.log("Client disconnected", userId);
   });
 });
+
+app.use("/api/auth", authRoutes);
 
 server.listen(PORT, () => {
   console.log("Server started on port:", PORT);

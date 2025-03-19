@@ -13,8 +13,8 @@ export function generateAccessToken(user: IUser) {
   });
 }
 
-export function generateRefreshToken(user: IUser) {
-  return jwt.sign({ id: user.id }, JWT_REFRESH_SECRET, {
+export function generateRefreshToken(userId: string) {
+  return jwt.sign({ id: userId }, JWT_REFRESH_SECRET, {
     expiresIn: "30d",
   });
 }
