@@ -4,11 +4,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { WebSocketServer, type WebSocket } from "ws";
 
-import "dotenv/config";
-const PORT = process.env.PORT as string;
-const WS_PORT = process.env.WS_PORT as string;
-
 import { UserManager } from "./sockets/userManager";
+import { APP_ORIGIN, PORT, WS_PORT } from "./constants/env";
 
 const app = express();
 
@@ -17,7 +14,7 @@ app.use(express.json());
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:5173"],
+    origin: APP_ORIGIN,
   })
 );
 

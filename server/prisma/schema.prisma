@@ -7,16 +7,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Session {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  refreshToken String?  @unique
+  userAgent    String?
+  expiresAt    DateTime @map("expires-at")
+  createdAt    DateTime @default(now()) @map("created-at")
+  updatedAt    DateTime @updatedAt @map("updated-at")
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationCode {
+  id        String               @id @default(cuid())
+  type      VerificationCodeType
+  user      User                 @relation(fields: [userId], references: [id])
+  userId    String
+  expiresAt DateTime             @map("expires-at")
+  createdAt DateTime             @default(now()) @map("created-at")
+  updatedAt DateTime             @updatedAt @map("updated-at")
+
+  @@index([userId])
+  @@map("verification-codes")
+}
+
 model User {
-  id        String            @id @default(cuid())
-  image     String
-  name      String
-  email     String            @unique
-  password  String
-  chats     ChatParticipant[]
-  messages  Message[]
-  createdAt DateTime          @default(now()) @map("created_at")
-  updatedAt DateTime          @updatedAt @map("updated_at")
+  id                String             @id @default(cuid())
+  image             String?
+  name              String?
+  email             String             @unique
+  password          String?
+  provider          AuthProvider?
+  providerId        String?            @unique
+  verified          Boolean            @default(false)
+  verificationCodes VerificationCode[]
+  sessions          Session[]
+  chats             ChatParticipant[]
+  messages          Message[]
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -61,6 +93,17 @@ model Message {
   updatedAt DateTime    @updatedAt @map("updated_at")
 
   @@map("messages")
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  GITHUB
+}
+
+enum VerificationCodeType {
+  EMAIL_VERIFICATION
+  RESET_PASSWORD
 }
 
 enum ParticipantRole {
