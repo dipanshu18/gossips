@@ -88,6 +88,22 @@ export async function signupHandler(req: Request, res: Response) {
   }
 }
 
+export async function loginHandler(req: Request, res: Response) {
+  const user = req.user;
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user.id);
+
+  res.cookie("accessToken", accessToken, getAccessTokenCookieOptions());
+  res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
+
+  res.status(OK).json({
+    user,
+    refreshToken,
+    accessToken,
+  });
+}
+
 export async function refreshTokenHandler(req: Request, res: Response) {
   try {
     const refreshToken = req.cookies.refreshToken as string | undefined;

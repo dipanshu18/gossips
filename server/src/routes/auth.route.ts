@@ -1,5 +1,8 @@
 import { Router } from "express";
+import passport from "passport";
+
 import {
+  loginHandler,
   logoutHandler,
   refreshTokenHandler,
   signupHandler,
@@ -8,7 +11,11 @@ import {
 const authRoutes = Router();
 
 authRoutes.post("/signup", signupHandler);
-authRoutes.post("/login");
+authRoutes.post(
+  "/login",
+  passport.authenticate("local", { session: false }),
+  loginHandler
+);
 authRoutes.post("/login/google");
 authRoutes.post("/google/callback");
 authRoutes.get("/logout", logoutHandler);

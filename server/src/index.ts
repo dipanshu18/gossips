@@ -4,9 +4,10 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { WebSocketServer, type WebSocket } from "ws";
 
-import { UserManager } from "./sockets/userManager";
 import { APP_ORIGIN, PORT, WS_PORT } from "./constants/env";
+import "./strategies/localStrategy";
 import authRoutes from "./routes/auth.route";
+import { UserManager } from "./sockets/userManager";
 
 const app = express();
 
