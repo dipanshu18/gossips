@@ -102,6 +102,24 @@ export async function loginHandler(req: Request, res: Response) {
     refreshToken,
     accessToken,
   });
+  return;
+}
+
+export async function loginWithGoogleHandler(req: Request, res: Response) {
+  const user = req.user;
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user.id);
+
+  res.cookie("accessToken", accessToken, getAccessTokenCookieOptions());
+  res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
+
+  res.status(OK).json({
+    user,
+    refreshToken,
+    accessToken,
+  });
+  return;
 }
 
 export async function refreshTokenHandler(req: Request, res: Response) {
@@ -166,6 +184,13 @@ export async function refreshTokenHandler(req: Request, res: Response) {
 
 export async function logoutHandler(req: Request, res: Response) {
   const accessToken = req.cookies.accessToken as string | undefined;
+  if (!accessToken) {
+    res.status(UNAUTHORIZED).json({
+      message: "Unauthorized",
+    });
+    return;
+  }
+
   const decoded = jwt.verify(
     accessToken || "",
     JWT_ACCESS_SECRET
@@ -173,7 +198,7 @@ export async function logoutHandler(req: Request, res: Response) {
 
   if (!decoded) {
     res.status(UNAUTHORIZED).json({
-      message: "Invalid refresh token",
+      message: "Invalid token",
     });
     return;
   }

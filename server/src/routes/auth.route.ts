@@ -3,6 +3,7 @@ import passport from "passport";
 
 import {
   loginHandler,
+  loginWithGoogleHandler,
   logoutHandler,
   refreshTokenHandler,
   signupHandler,
@@ -16,8 +17,15 @@ authRoutes.post(
   passport.authenticate("local", { session: false }),
   loginHandler
 );
-authRoutes.post("/login/google");
-authRoutes.post("/google/callback");
+authRoutes.get(
+  "/login/google",
+  passport.authenticate("google", { scope: ["email", "profile"] })
+);
+authRoutes.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  loginWithGoogleHandler
+);
 authRoutes.get("/logout", logoutHandler);
 authRoutes.get("/refresh", refreshTokenHandler);
 authRoutes.get("/email/verify/:code");

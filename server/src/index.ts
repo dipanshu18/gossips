@@ -6,6 +6,7 @@ import { WebSocketServer, type WebSocket } from "ws";
 
 import { APP_ORIGIN, PORT, WS_PORT } from "./constants/env";
 import "./strategies/localStrategy";
+import "./strategies/oauthStrategy";
 import authRoutes from "./routes/auth.route";
 import { UserManager } from "./sockets/userManager";
 

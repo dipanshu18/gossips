@@ -22,6 +22,6 @@ export function getRefreshTokenCookieOptions(): CookieOptions {
   return {
     ...defaults,
     expires: thirtyDaysFromNow(),
-    path: "/auth/refresh",
+    path: "/api/auth/refresh",
   };
 }
