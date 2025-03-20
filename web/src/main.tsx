@@ -7,6 +7,7 @@ import App from "./App.tsx";
 import { SocketProvider } from "./contexts/SocketContext.tsx";
 import { BrowserRouter } from "react-router";
 import { Navbar } from "./components/Navbar.tsx";
+import { Toaster } from "sonner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
       <SocketProvider>
         <Navbar />
         <App />
+        <Toaster position="top-right" richColors />
       </SocketProvider>
     </BrowserRouter>
   </StrictMode>

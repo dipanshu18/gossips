@@ -1,3 +1,15 @@
+export interface IUser {
+  id: string;
+  image: string;
+  name: string;
+  email: string;
+  provider: "GOOGLE" | "GITHUB" | "EMAIL";
+  providerId: string;
+  verified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IChat {
   id: string;
   isGroup: boolean;

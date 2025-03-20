@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import {
   CONFLICT,
@@ -18,7 +18,11 @@ import {
   getAccessTokenCookieOptions,
   getRefreshTokenCookieOptions,
 } from "../utils/cookies";
-import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../constants/env";
+import {
+  APP_ORIGIN,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+} from "../constants/env";
 
 export async function signupHandler(req: Request, res: Response) {
   try {
@@ -50,6 +54,7 @@ export async function signupHandler(req: Request, res: Response) {
         image,
         name,
         email,
+        provider: "EMAIL",
         password: hashPassword,
       },
       omit: {
@@ -108,18 +113,18 @@ export async function loginHandler(req: Request, res: Response) {
 export async function loginWithGoogleHandler(req: Request, res: Response) {
   const user = req.user;
 
+  if (!user) {
+    res.redirect(`${APP_ORIGIN}/login?error=unauthorized`);
+    return;
+  }
+
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user.id);
 
   res.cookie("accessToken", accessToken, getAccessTokenCookieOptions());
   res.cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
 
-  res.status(OK).json({
-    user,
-    refreshToken,
-    accessToken,
-  });
-  return;
+  res.redirect(`${APP_ORIGIN}/login?token=${accessToken}`);
 }
 
 export async function refreshTokenHandler(req: Request, res: Response) {

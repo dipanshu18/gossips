@@ -58,13 +58,7 @@ export default function Signup() {
                 />
               </div>
 
-              <div>
-                <Link to={"#"} className="link link-hover">
-                  Forgot password?
-                </Link>
-              </div>
-
-              <button type="submit" className="btn btn-neutral">
+              <button type="submit" className="btn btn-neutral mt-5">
                 Signup
               </button>
 

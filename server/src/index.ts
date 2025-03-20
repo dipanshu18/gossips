@@ -5,23 +5,25 @@ import cookieParser from "cookie-parser";
 import { WebSocketServer, type WebSocket } from "ws";
 
 import { APP_ORIGIN, PORT, WS_PORT } from "./constants/env";
-import "./strategies/localStrategy";
-import "./strategies/oauthStrategy";
 import authRoutes from "./routes/auth.route";
+import userRoutes from "./routes/user.route";
 import { UserManager } from "./sockets/userManager";
+import passport from "passport";
+import { authenticate } from "./middlewares/authenticate";
 
 const app = express();
 
 app.use(express.json());
 
-app.use(
-  cors({
-    credentials: true,
-    origin: APP_ORIGIN,
-  })
-);
+const corsOptions = {
+  origin: APP_ORIGIN,
+  methods: ["GET", "PUT", "PATCH", "POST", "DELETE"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
+app.use(passport.initialize());
 
 const server = http.createServer(app);
 
@@ -34,26 +36,24 @@ wss.on("connection", (socket: WebSocket, request) => {
     console.log("Error:", err);
   });
 
-  const userId = request.url?.split("?")[1].split("&")[0].split("=")[1];
-  const chatId = request.url?.split("?")[1].split("&")[1].split("=")[1];
+  console.log("Client connected");
 
-  console.log("Client connected", userId);
+  // const user = new UserManager(String(userId), socket, String(chatId));
 
-  const user = new UserManager(String(userId), socket, String(chatId));
-
-  socket.on("message", (data) => {
-    const decoded = JSON.parse(data.toString());
-    user.sendMessage({ userId, ...decoded });
-  });
+  // socket.on("message", (data) => {
+  //   const decoded = JSON.parse(data.toString());
+  //   user.sendMessage({ userId, ...decoded });
+  // });
 
   socket.on("close", () => {
-    user.removeUser(userId as string, chatId as string);
+    // user.removeUser(userId as string, chatId as string);
     socket.close();
-    console.log("Client disconnected", userId);
+    console.log("Client disconnected");
   });
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", authenticate, userRoutes);
 
 server.listen(PORT, () => {
   console.log("Server started on port:", PORT);

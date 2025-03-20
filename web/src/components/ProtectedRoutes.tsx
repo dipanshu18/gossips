@@ -1,19 +1,7 @@
 import { Navigate, Outlet } from "react-router";
-import useAuth from "../hooks/useAuth";
-import { Spinner } from "./Spinner";
 
-export function ProtectedRoutes() {
-  const { isLoading, user } = useAuth();
-
-  return isLoading ? (
-    <div className="hero min-h-screen">
-      <div className="hero-content text-neutral-content text-center">
-        <div className="max-w-md mx-auto">
-          <Spinner />
-        </div>
-      </div>
-    </div>
-  ) : user ? (
+export function ProtectedRoutes({ isAuth }: { isAuth: boolean }) {
+  return isAuth ? (
     <div className="md:max-w-7xl mx-auto px-5 md:px-12">
       <Outlet />
     </div>

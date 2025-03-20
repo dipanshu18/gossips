@@ -8,6 +8,9 @@ import {
   refreshTokenHandler,
   signupHandler,
 } from "../controllers/auth.controller";
+import { APP_ORIGIN } from "../constants/env";
+import "../strategies/localStrategy";
+import "../strategies/oauthStrategy";
 
 const authRoutes = Router();
 
@@ -19,13 +22,19 @@ authRoutes.post(
 );
 authRoutes.get(
   "/login/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
+  passport.authenticate("google", {
+    scope: ["email", "profile"],
+    session: false,
+  })
 );
 authRoutes.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
+  passport.authenticate("google", {
+    session: false,
+  }),
   loginWithGoogleHandler
 );
+
 authRoutes.get("/logout", logoutHandler);
 authRoutes.get("/refresh", refreshTokenHandler);
 authRoutes.get("/email/verify/:code");

@@ -22,35 +22,47 @@ passport.use(
 
       const existingUser = await db.user.findFirst({
         where: { email: profile?.emails[0].value },
+        omit: { password: true },
       });
 
-      if (existingUser) {
+      if (existingUser?.provider === "EMAIL") {
         return done(null, false, {
           message: "You have signed up with email-password",
         });
       }
 
-      const newUser = await db.user.create({
-        data: {
-          email: profile.emails[0].value,
-          name: profile.displayName,
-          provider: "GOOGLE",
-          providerId: profile.id,
-          image: profile.photos[0].value ?? "",
-        },
-      });
+      if (!existingUser) {
+        const newUser = await db.user.create({
+          data: {
+            email: profile.emails[0].value,
+            name: profile.displayName,
+            provider: "GOOGLE",
+            providerId: profile.id,
+            image: profile.photos[0].value ?? "",
+          },
+        });
 
-      const verificationCode = await db.verificationCode.create({
-        data: {
-          expiresAt: oneYearFromNow(),
-          type: "EMAIL_VERIFICATION",
-          userId: newUser.id,
-        },
-      });
+        const verificationCode = await db.verificationCode.create({
+          data: {
+            expiresAt: oneYearFromNow(),
+            type: "EMAIL_VERIFICATION",
+            userId: newUser.id,
+          },
+        });
 
-      // send a verification email
+        // send a verification email
 
-      return done(null, newUser);
+        return done(null, newUser);
+      }
+
+      return done(null, existingUser);
     }
   )
 );
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  console.log(id);
+  const user = await db.user.findFirst({ where: { id } });
+  done(null, user);
+});

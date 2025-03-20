@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt, { JsonWebTokenError, type JwtPayload } from "jsonwebtoken";
 
 import { UNAUTHORIZED } from "../constants/httpStatus";
@@ -12,9 +12,10 @@ export async function authenticate(
   const accessToken = req.cookies.accessToken as string | undefined;
 
   if (!accessToken) {
-    return res.status(UNAUTHORIZED).json({
+    res.status(UNAUTHORIZED).json({
       message: "Unauthorized",
     });
+    return;
   }
 
   let decoded: JwtPayload | undefined;
@@ -23,17 +24,19 @@ export async function authenticate(
   } catch (error) {
     if (error instanceof JsonWebTokenError) {
       if (error.message === "token-expired") {
-        return res.status(UNAUTHORIZED).json({
+        res.status(UNAUTHORIZED).json({
           message: "Token expired",
         });
+        return;
       }
     }
   }
 
   if (!decoded) {
-    return res.status(UNAUTHORIZED).json({
+    res.status(UNAUTHORIZED).json({
       message: "Invalid token",
     });
+    return;
   }
 
   req.user = { id: decoded.id, email: decoded.email };
