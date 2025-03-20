@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { FcGoogle } from "react-icons/fc";
-import axios, { AxiosError } from "axios";
-import { BASE_URL } from "../constants/api";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
+
+import { API } from "../constants/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,9 +31,13 @@ export default function Login() {
   }) {
     try {
       setLoading(true);
-      const response = await axios.post(`${BASE_URL}/auth/login`, credentials, {
-        withCredentials: true,
-      });
+      const response = await API.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        credentials,
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         const data = await response.data;
@@ -52,7 +57,7 @@ export default function Login() {
 
   async function loginWithGoogle() {
     setLoading(true);
-    window.open(`${BASE_URL}/auth/login/google`, "_self");
+    window.open(`${import.meta.env.VITE_API_URL}/auth/login/google`, "_self");
   }
 
   return (

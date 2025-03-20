@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { JsonWebTokenError, type JwtPayload } from "jsonwebtoken";
 
-import { UNAUTHORIZED } from "../constants/httpStatus";
+import { FORBIDDEN, UNAUTHORIZED } from "../constants/httpStatus";
 import { JWT_ACCESS_SECRET } from "../constants/env";
 
 export async function authenticate(
@@ -12,8 +12,8 @@ export async function authenticate(
   const accessToken = req.cookies.accessToken as string | undefined;
 
   if (!accessToken) {
-    res.status(UNAUTHORIZED).json({
-      message: "Unauthorized",
+    res.status(FORBIDDEN).json({
+      message: "No access token",
     });
     return;
   }
@@ -24,7 +24,7 @@ export async function authenticate(
   } catch (error) {
     if (error instanceof JsonWebTokenError) {
       if (error.message === "token-expired") {
-        res.status(UNAUTHORIZED).json({
+        res.status(FORBIDDEN).json({
           message: "Token expired",
         });
         return;

@@ -59,10 +59,3 @@ passport.use(
     }
   )
 );
-
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => {
-  console.log(id);
-  const user = await db.user.findFirst({ where: { id } });
-  done(null, user);
-});

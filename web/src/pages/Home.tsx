@@ -1,16 +1,31 @@
-import { useState } from "react";
-import ChatBox from "../components/ChatBox";
-import useMobileView from "../hooks/useMobileView";
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
+import { cn } from "../lib/utils";
 
-export default function Home() {
+export default function Home({
+  children,
+  chatOpen,
+}: {
+  children?: ReactNode;
+  chatOpen: React.MutableRefObject<boolean>;
+}) {
   const navigate = useNavigate();
-  const [selectedChat, setSelectedChat] = useState(0);
-  const isMobile = useMobileView(628);
+
+  function handleSelectedChat(idx: number) {
+    chatOpen.current = true;
+    navigate(`/home/${idx}`);
+  }
+
+  console.log(chatOpen.current);
 
   return (
     <div className="flex h-[90dvh] scrollbar-thumb-neutral-800 scrollbar-track-neutral-950">
-      <div className="md:max-w-2xs lg:max-w-md flex-1 h-full scrollbar-thin md:overflow-y-auto gap-2 flex flex-col py-2">
+      <div
+        className={cn(
+          "md:max-w-xs lg:max-w-md flex-1 h-full scrollbar-thin md:overflow-y-auto flex flex-col py-2",
+          chatOpen.current ? "hidden md:block" : ""
+        )}
+      >
         {Array(17)
           .fill("")
           .map((_, idx) => (
@@ -18,12 +33,13 @@ export default function Home() {
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
               key={idx}
-              onClick={() =>
-                isMobile ? navigate(`/home/${idx}`) : setSelectedChat(idx)
-              }
-              className={
-                "cursor-pointer flex items-center gap-1 bg-base-200 rounded-md py-5 pl-5 hover:bg-base-200"
-              }
+              onClick={(e) => {
+                e.preventDefault();
+                handleSelectedChat(idx);
+              }}
+              className={cn(
+                "cursor-pointer flex items-center gap-2 border border-base-200 rounded-md py-5 pl-5 hover:bg-base-200 transition-all duration-300"
+              )}
             >
               <img
                 src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
@@ -34,9 +50,11 @@ export default function Home() {
             </div>
           ))}
       </div>
-      <div className="flex-1 hidden md:block p-2">
-        {selectedChat ? (
-          <ChatBox chatId={selectedChat} />
+      <div
+        className={cn("flex-1 p-2", !chatOpen.current ? "hidden md:block" : "")}
+      >
+        {chatOpen.current ? (
+          children
         ) : (
           <div className="flex items-center justify-center h-full">
             <h1 className="text-xl font-extrabold">

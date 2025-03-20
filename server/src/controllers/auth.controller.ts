@@ -148,7 +148,6 @@ export async function refreshTokenHandler(req: Request, res: Response) {
     }
 
     const { exp, id } = decoded as JwtPayload;
-    let newRefreshToken: string | undefined;
     let newAccessToken: string | undefined;
     if (exp && exp - Date.now() <= ONE_DAY_MS) {
       const user = await db.user.findFirst({ where: { id } });
@@ -158,16 +157,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
         return;
       }
 
-      newRefreshToken = generateRefreshToken(id);
       newAccessToken = generateAccessToken(user);
-    }
-
-    if (newRefreshToken) {
-      res.cookie(
-        "refreshToken",
-        newRefreshToken,
-        getRefreshTokenCookieOptions()
-      );
     }
 
     res.cookie("accessToken", newAccessToken, getAccessTokenCookieOptions());
@@ -175,7 +165,6 @@ export async function refreshTokenHandler(req: Request, res: Response) {
     res.status(OK).json({
       message: "Access token refreshed",
       accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
     });
     return;
   } catch (error) {

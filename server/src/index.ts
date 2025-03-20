@@ -10,6 +10,7 @@ import userRoutes from "./routes/user.route";
 import { UserManager } from "./sockets/userManager";
 import passport from "passport";
 import { authenticate } from "./middlewares/authenticate";
+import cloudinaryRoutes from "./routes/cloudinary.route";
 
 const app = express();
 
@@ -24,6 +25,12 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(passport.initialize());
+
+app.use((req, _res, next) => {
+  console.log(req.method, req.path);
+  console.log();
+  next();
+});
 
 const server = http.createServer(app);
 
@@ -52,6 +59,7 @@ wss.on("connection", (socket: WebSocket, request) => {
   });
 });
 
+app.use("/api/media", cloudinaryRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", authenticate, userRoutes);
 
